@@ -2,15 +2,33 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+
+// direct reference gravity ui 
+import SunIcon from '@gravity-ui/icons/svgs/sun.svg';
+import MoonIcon from '@gravity-ui/icons/svgs/moon.svg';
 
 export default function Navbar() {
   const router = useRouter();
   const currentPath = usePathname();
   const [searchFocused, setSearchFocused] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   
   const { data: session, isPending } = authClient.useSession();
+
+  // Synchronize design token themes dynamically with the document layout root
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (darkMode) {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const handleLogout = async () => {
     try {
@@ -33,11 +51,11 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-[#AFA9EC]/20 bg-white/90 backdrop-blur-md dark:bg-[#1A1730]/90 transition-colors duration-300">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/*  branding & navigation Links */}
+        {/* Branding & Navigation Links Section */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2.5 transition-transform active:scale-95">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#534AB7] text-white shadow-[0_4px_12px_rgba(83,74,183,0.3)]">
-              {/* mimicking gravity ui icons*/}
+              {/* Core Layout Identity Vector */}
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m12 3-10 5 10 5 10-5-10-5Z" />
                 <path d="m2 17 10 5 10-5" />
@@ -69,10 +87,9 @@ export default function Navbar() {
           </nav>
         </div>
 
-        {/*  Search Bar part */}
+        {/* Global Filter Search Module Bar */}
         <div className="hidden sm:flex relative max-w-sm w-full mx-4">
           <div className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[#7F77DD]">
-            {/* another gravity ui mimick magnifier Icon(will add gravity ui later if possible) */}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
@@ -92,18 +109,25 @@ export default function Navbar() {
           </kbd>
         </div>
 
-        {/* Interactive Actions & Settings Dropdowns */}
+        {/* Interactive Actions Stack */}
         <div className="flex items-center gap-3.5">
           <button className="hidden sm:inline-flex h-10 items-center justify-center rounded-full bg-[#534AB7] px-5 text-sm font-medium text-white shadow-[0_4px_12px_rgba(83,74,183,0.2)] transition-all hover:bg-[#3C3489] active:scale-95">
             Add Card
           </button>
 
-          {/* Theme Switcher Key */}
-          <button className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-100 bg-slate-50 text-slate-500 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400 transition-colors">
-            {/* another gravity ui mimick  Moon Icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-            </svg>
+          {/* theme mode toggle from gravity ui used direct link */}
+          <button 
+            onClick={() => setDarkMode(!darkMode)}
+            aria-label="Toggle visual theme mode"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-100 bg-slate-50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800 transition-all duration-200 active:scale-90 shadow-sm"
+          >
+            <Image 
+              src={darkMode ? SunIcon : MoonIcon} 
+              alt="Theme status icon indicator" 
+              width={18} 
+              height={18}
+              className="opacity-80 dark:invert-0 transition-opacity"
+            />
           </button>
 
           {/* Context Boundary for Session Profile Check */}
