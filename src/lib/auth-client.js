@@ -1,34 +1,58 @@
+// src/lib/auth-client.js
 import { createAuthClient } from "better-auth/react";
 
-// 1. Core initialization for production / connected execution environments
+// 1. Core initialization for connected server execution environments
 const realClient = typeof window !== "undefined" 
   ? createAuthClient({ baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000" })
   : null;
 
-// 2. Safe frontend isolation mock engine to allow building UI without a running server
+// 2. Safe frontend isolation mock engine with explicit credential validation
 const mockClient = {
-  useSession: () => ({
-    // Change data to null if you want to test how the logged-out UI looks!
-    data: {
-      user: {
-        name: "muna rahman",
-        email: "muna@devdeck.io",
-        image: "https://api.dicebear.com/7.x/open-peeps/svg?seed=MunaDevDeck"
-      }
-    },
-    isPending: false,
-    error: null
-  }),
+  useSession: () => {
+    // Check if a mock session token exists in client storage to persist login state
+    const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("devdeck_mock_session") === "true";
+    
+    return {
+      data: isLoggedIn ? {
+        user: {
+          name: "Muna Nemme",
+          email: "munanemme@gmail.com",
+          image: "https://api.dicebear.com/7.x/open-peeps/svg?seed=AlexDevDeck"
+        }
+      } : null,
+      isPending: false,
+      error: null
+    };
+  },
   signOut: async () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("devdeck_mock_session");
+    }
     console.log("Mock Mode: Sign out intercepted cleanly.");
     return { success: true };
   },
   signIn: {
     email: async ({ email, password }) => {
-      console.log("Mock Mode: Intercepted email verification handler for", email);
-      return { data: { user: { name: "Alex Chen" } }, error: null };
+      console.log("Mock Mode: Intercepting credential validation loop...");
+      
+      // Enforce the requested frontend-only base credentials
+      if (email === "devdeck@gmail.com" && password === "12345678") {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("devdeck_mock_session", "true");
+        }
+        return { 
+          data: { user: { name: "Alex Chen", email: "devdeck@gmail.com" } }, 
+          error: null 
+        };
+      } else {
+        return { 
+          data: null, 
+          error: { message: "Invalid credentials. Use devdeck@gmail.com // 12345678" } 
+        };
+      }
     }
   }
 };
 
-export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : realClient;
+// Make sure NEXT_PUBLIC_MOCK_MODE="true" is set in your .env or fallback cleanly to mock here
+export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : mockClient;
