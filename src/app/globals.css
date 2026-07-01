@@ -1,12 +1,25 @@
-
-/* for frosted glass and dark theme this part  */
+/* src/app/globals.css */
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
 
 @layer utilities {
+  /* Frosted Glass Effect */
   .backdrop-blur-glass {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Game HUD Accent Text Fills */
+  .text-gradient-primary {
+    background: linear-gradient(to right, #E94FD1, #FF6FB5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-gradient-warning {
+    background: linear-gradient(to right, #FFB84D, #FF7A3D);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }
