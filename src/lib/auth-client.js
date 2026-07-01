@@ -11,9 +11,9 @@ const mockClient = {
     // Change data to null if you want to test how the logged-out UI looks!
     data: {
       user: {
-        name: "Alex Chen",
-        email: "alex@devdeck.io",
-        image: "https://api.dicebear.com/7.x/open-peeps/svg?seed=AlexDevDeck"
+        name: "muna rahman",
+        email: "muna@devdeck.io",
+        image: "https://api.dicebear.com/7.x/open-peeps/svg?seed=MunaDevDeck"
       }
     },
     isPending: false,

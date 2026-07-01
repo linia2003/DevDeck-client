@@ -1,4 +1,12 @@
+
+/* for frosted glass and dark theme this part  */
 @import "tailwindcss";
 
-
 @variant dark (&:where(.dark, .dark *));
+
+@layer utilities {
+  .backdrop-blur-glass {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
