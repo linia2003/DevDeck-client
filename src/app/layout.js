@@ -14,10 +14,7 @@ export default function RootLayout({ children }) {
         
         {/* Layered Game Interface Ambient Glow Blobs */}
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-          {/* Top-Right Magenta/Pink Glow Source */}
           <div className="absolute -top-[10%] -right-[10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#E94FD1] to-[#FF6FB5] opacity-8 dark:opacity-20 blur-[250px]" />
-          
-          {/* Left Edge Teal/Cyan Glow Source */}
           <div className="absolute top-[25%] -left-[15%] w-[550px] h-[550px] rounded-full bg-gradient-to-tr from-[#3FE0C5] to-[#2FD1FF] opacity-6 dark:opacity-15 blur-[200px]" />
         </div>
 

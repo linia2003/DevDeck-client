@@ -2,23 +2,39 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function LayoutClientWrapper({ children }) {
   const pathname = usePathname();
-  
-  // Check if current view is the access login initialization gate
+  const [mounted, setMounted] = useState(false);
+
+  // Delay execution until after initial client mount pass to prevent SSR mismatches
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isLoginPage = pathname === "/login";
+
+  if (!mounted) {
+    return (
+      <div className="relative flex min-h-screen flex-col z-10">
+        <main className="flex-1 flex flex-col">{children}</main>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col z-10">
-      {/* Conditionally display the core navigation frame based on routing parameters */}
+      {/* Safe client-side conditional render */}
       {!isLoginPage && <Navbar />}
       
-      {/* Primary Viewport Context */}
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col">
         {children}
       </main>
+
+      {!isLoginPage && <Footer />}
     </div>
   );
 }

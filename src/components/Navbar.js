@@ -15,8 +15,13 @@ export default function Navbar() {
   const currentPath = usePathname();
   const [searchFocused, setSearchFocused] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [mounted, setMounted] = useState(false);
   
   const { data: session, isPending } = authClient.useSession();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -50,6 +55,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-[rgba(20,20,40,0.06)] bg-white/80 backdrop-blur-glass dark:border-white/8 dark:bg-[#1A1D29]/65 transition-colors duration-300">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
+        {/* Branding */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2.5 transition-transform active:scale-95 group">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-[#E94FD1] to-[#FF6FB5] dark:from-[#D6249F] text-white shadow-[0_0_15px_rgba(233,79,209,0.35)]">
@@ -84,6 +90,7 @@ export default function Navbar() {
           </nav>
         </div>
 
+        {/* Global Filter Search Module Bar */}
         <div className="hidden sm:flex relative max-w-sm w-full mx-4">
           <div className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[#5B5F72] dark:text-[#9CA3B5]">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -96,13 +103,14 @@ export default function Navbar() {
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
             placeholder="Search dashboard..."
-            className="w-full h-10 rounded-xl border border-[rgba(20,20,40,0.08)] bg-white/40 pl-10 pr-12 text-xs uppercase font-medium tracking-wide text-[#1A1D29] outline-none transition-all duration-200 focus:border-[#D6249F] dark:border-white/10 dark:bg-[#1A1D29]/40 dark:text-[#F5F6FA] dark:focus:border-[#FF6FB5]/50 focus:ring-2 focus:ring-[#FF6FB5]/10"
+            className="w-full h-10 rounded-xl border border-[rgba(20,20,40,0.08)] bg-white/40 pl-10 pr-12 text-xs uppercase font-medium tracking-wide text-[#1A1D29] dark:text-[#F5F6FA] outline-none transition-all focus:border-[#D6249F] dark:focus:border-[#FF6FB5]/50 focus:ring-2 focus:ring-[#FF6FB5]/10"
           />
           <kbd className="absolute right-3 top-2 inline-flex h-6 select-none items-center gap-0.5 rounded-md border border-[rgba(20,20,40,0.08)] bg-white px-1.5 font-sans text-[10px] font-medium text-[#5B5F72] dark:border-white/10 dark:bg-[#1A1D29] dark:text-[#9CA3B5]">
             <span>⌘</span>K
           </kbd>
         </div>
 
+        {/* Interactive Actions Stack */}
         <div className="flex items-center gap-3.5">
           <button className="hidden sm:inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#E94FD1] to-[#FF6FB5] dark:from-[#D6249F] px-5 text-xs font-semibold uppercase tracking-wider text-white shadow-[0_0_15px_rgba(233,79,209,0.25)] hover:opacity-95 active:scale-95 transition-all">
             Add Card
@@ -122,7 +130,8 @@ export default function Navbar() {
             />
           </button>
 
-          {!isPending && session?.user && (
+          {/* Render Profile Section safely on client post-mount */}
+          {mounted && !isPending && session?.user ? (
             <div className="relative group">
               <button className="flex items-center outline-none">
                 <img
@@ -144,6 +153,12 @@ export default function Navbar() {
                 </button>
               </div>
             </div>
+          ) : (
+            mounted && !isPending && (
+              <Link href="/login" className="text-sm font-medium text-[#5B5F72] hover:text-[#1A1D29] dark:text-[#9CA3B5] dark:hover:text-[#F5F6FA]">
+                Sign In
+              </Link>
+            )
           )}
         </div>
       </div>
