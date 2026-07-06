@@ -1,18 +1,26 @@
-
+// src/lib/auth-client.js
 import { createAuthClient } from "better-auth/react";
 
-// Automatically selects Vercel production API URL, or falls back to local port 3001
+// Automatically selects the live Vercel environment API URL or falls back to local development port 3001
 const getBaseURL = () => {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  return "http://localhost:3001"; 
+  return "http://localhost:3001";
 };
+
+// Initialize the real Better Auth client instance safely checking for the browser environment
 const realClient = typeof window !== "undefined" 
-  ? createAuthClient({ baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000" })
+  ? createAuthClient({ 
+      baseURL: getBaseURL(),
+      fetchOptions: {
+        // Crucial for cross-subdomain cookie handling between detached Vercel domains
+        credentials: "include", 
+      }
+    })
   : null;
 
-// 2. Safe frontend isolation mock engine with explicit credential validation
+// Safe frontend isolation mock engine with dynamic parameters (used only when NEXT_PUBLIC_MOCK_MODE=true)
 const mockClient = {
   useSession: () => {
     const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("devdeck_mock_session") === "true";
@@ -22,7 +30,7 @@ const mockClient = {
         user: {
           name: "Muna Nemme",
           email: "munanemme@gmail.com",
-          image: "https://api.dicebear.com/7.x/open-peeps/svg?seed=AlexDevDeck"
+          image: `https://api.dicebear.com/7.x/open-peeps/svg?seed=AlexDevDeck`
         }
       } : null,
       isPending: false,
@@ -63,5 +71,5 @@ const mockClient = {
   }
 };
 
-// Fixed: Now cleanly maps to realClient when NEXT_PUBLIC_MOCK_MODE is not "true"
+// Dynamically exports the appropriate client engine depending strictly on environment configuration
 export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : realClient;
