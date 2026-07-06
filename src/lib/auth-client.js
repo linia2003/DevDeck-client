@@ -8,14 +8,13 @@ const getBaseURL = () => {
   return "http://localhost:3001";
 };
 
-const realClient = typeof window !== "undefined" 
-  ? createAuthClient({ 
-      baseURL: getBaseURL(),
-      fetchOptions: {
-        credentials: "include", // MANDATORY for cross-domain Vercel cookies
-      }
-    })
-  : null;
+// REMOVE the ternary condition here:
+const realClient = createAuthClient({ 
+  baseURL: getBaseURL(),
+  fetchOptions: {
+    credentials: "include", 
+  }
+});
 
 // Safe frontend isolation mock engine with dynamic parameters (used only when NEXT_PUBLIC_MOCK_MODE=true)
 const mockClient = {
