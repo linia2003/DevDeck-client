@@ -3,49 +3,59 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccessMsg("");
     setLoading(true);
 
-    // Simulate database staging execution delay
-    setTimeout(() => {
-      setLoading(false);
-      setSuccessMsg("Account created successfully! Redirecting...");
-      
-      // Auto-route back to login access gateway after a quick pause
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
-    }, 1000);
-  };
+    try {
+      // Generate a distinct avatar seed using the user's name
+      const uniqueAvatarUrl = `https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(name)}`;
+
+      const { data, error: authError } = await authClient.signUp.email({
+        email,
+        password,
+        name,
+        image: uniqueAvatarUrl, // This saves the custom unique image directly to MongoDB!
+      });
+
+      if (authError) {
+        setError(authError.message);
+      } else {
+        setSuccessMsg("Account created successfully! Redirecting...");
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+      }
+    } catch (err) {
+      setError("An error occurred during account deployment setup.");
+    }
+  }; // <--- Added the missing closing brace here to close handleSubmit cleanly
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 relative">
-      
-      {/* Immersive Panoramic Background Image */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
           backgroundImage: `url('https://i.pinimg.com/1200x/b2/8e/3e/b28e3e30962488350fe80888d2833967.jpg')`
         }}
       >
-        {/* Dark overlay mask matching the login panel configuration */}
         <div className="absolute inset-0 bg-[#0B0E14]/40 backdrop-brightness-[0.75] dark:backdrop-brightness-[0.45]" />
       </div>
 
-      {/* Frosted Registration Terminal Card */}
       <div className="w-full max-w-md rounded-2xl border border-[rgba(20,20,40,0.12)] dark:border-white/10 bg-white/70 dark:bg-[#1A1D29]/65 backdrop-blur-glass p-8 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative z-10">
-        
-        {/* Card Header Identity */}
         <div className="text-center mb-6">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-[#8c1372] to-[#c7589d] text-white shadow-[0_0_15px_rgba(233,79,209,0.4)] mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -63,16 +73,19 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Action Form Handler */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {successMsg && (
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-center text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
               {successMsg}
             </div>
           )}
 
-          {/* User Name Input Field */}
+          {error && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-center text-xs font-semibold uppercase tracking-wider text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.1)]">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#5B5F72] dark:text-[#9CA3B5] mb-1.5">
               Account Name
@@ -87,11 +100,9 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Email Input Field */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#5B5F72] dark:text-[#9CA3B5] mb-1.5">
               Type your email here
-
             </label>
             <input
               type="email"
@@ -103,7 +114,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Password Input Field */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#5B5F72] dark:text-[#9CA3B5] mb-1.5">
                 Type your password here
@@ -118,18 +128,15 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Registration Trigger Button */}
           <button
             type="submit"
             disabled={loading}
             className="w-full h-11 items-center justify-center rounded-xl bg-gradient-to-r from-[#cc35a6] to-[#9c245e] dark:from-[#3c082c] text-xs font-bold uppercase tracking-widest text-white shadow-[0_0_15px_rgba(233,79,209,0.25)] hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50"
           >
-            {loading ? "Registering Character..." : "Account created successfully! Redirecting..."}
+            {loading ? "Registering Character..." : "Register deployment credentials"}
           </button>
-
         </form>
 
-        {/* Existing Profile Links Redirect */}
         <div className="mt-6 pt-4 border-t border-[rgba(20,20,40,0.1)] dark:border-white/5 text-center">
           <p className="text-xs text-[#5B5F72] dark:text-[#9CA3B5]">
             Already have an account????{" "}
@@ -138,7 +145,6 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
-
       </div>
     </div>
   );

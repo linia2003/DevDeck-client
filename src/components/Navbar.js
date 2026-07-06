@@ -1,9 +1,8 @@
-// src/components/Navbar.js
 "use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 
@@ -16,11 +15,24 @@ export default function Navbar() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Added state tracking for dropdown
+  const dropdownRef = useRef(null); // Reference to close dropdown when clicking outside
   
   const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Close dropdown if user clicks anywhere else on the screen
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -37,6 +49,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await authClient.signOut();
+      setDropdownOpen(false);
       router.push("/login");
       router.refresh();
     } catch (err) {
@@ -132,23 +145,41 @@ export default function Navbar() {
 
           {/* Render Profile Section safely on client post-mount */}
           {mounted && !isPending && session?.user ? (
-            <div className="relative group">
-              <button className="flex items-center outline-none">
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)} 
+                className="flex items-center outline-none cursor-pointer transition-transform active:scale-95"
+              >
                 <img
-                  src={session.user.image}
-                  alt="User Profile"
-                  className="h-9 w-9 rounded-full border-2 border-[#FF6FB5] dark:border-[#E94FD1] object-cover"
-                />
+  src={session.user.image || `https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(session.user.name || 'default')}`}
+  alt="User Profile"
+  className="h-9 w-9 rounded-full border-2 border-[#FF6FB5] dark:border-[#E94FD1] object-cover"
+/>
               </button>
-              <div className="absolute right-0 mt-2.5 w-52 origin-top-right rounded-2xl border border-[rgba(20,20,40,0.08)] bg-white/95 backdrop-blur-glass p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all dark:border-white/8 dark:bg-[#1A1D29]/95 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto">
+              
+              {/* Controlled dynamically via conditional rendering + transition checks */}
+              <div 
+                className={`absolute right-0 mt-2.5 w-52 origin-top-right rounded-2xl border border-[rgba(20,20,40,0.08)] bg-white/95 backdrop-blur-glass p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-150 dark:border-white/8 dark:bg-[#1A1D29]/95 ${
+                  dropdownOpen 
+                    ? "opacity-100 scale-100 pointer-events-auto" 
+                    : "opacity-0 scale-95 pointer-events-none"
+                }`}
+              >
                 <div className="px-3 py-2 border-b border-[rgba(20,20,40,0.06)] dark:border-white/5 mb-1">
                   <p className="text-xs font-semibold text-[#1A1D29] dark:text-[#F5F6FA] truncate">{session.user.name}</p>
                   <p className="text-[11px] text-[#5B5F72] dark:text-[#9CA3B5] truncate">{session.user.email}</p>
                 </div>
-                <Link href="/profile" className="flex items-center w-full px-3 py-2 text-xs rounded-xl text-[#5B5F72] dark:text-[#9CA3B5] hover:bg-white/10">
+                <Link 
+                  href="/profile" 
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center w-full px-3 py-2 text-xs rounded-xl text-[#5B5F72] dark:text-[#9CA3B5] hover:bg-black/5 dark:hover:bg-white/10"
+                >
                   Profile Settings
                 </Link>
-                <button onClick={handleLogout} className="flex items-center w-full px-3 py-2 text-xs font-medium rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20">
+                <button 
+                  onClick={handleLogout} 
+                  className="flex items-center w-full px-3 py-2 text-xs font-medium rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer text-left"
+                >
                   Sign Out
                 </button>
               </div>

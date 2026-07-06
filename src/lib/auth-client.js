@@ -9,7 +9,6 @@ const realClient = typeof window !== "undefined"
 // 2. Safe frontend isolation mock engine with explicit credential validation
 const mockClient = {
   useSession: () => {
-    // Check if a mock session token exists in client storage to persist login state
     const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("devdeck_mock_session") === "true";
     
     return {
@@ -34,8 +33,6 @@ const mockClient = {
   signIn: {
     email: async ({ email, password }) => {
       console.log("Mock Mode: Intercepting credential validation loop...");
-      
-      // Enforce the requested frontend-only base credentials
       if (email === "devdeck@gmail.com" && password === "12345678") {
         if (typeof window !== "undefined") {
           localStorage.setItem("devdeck_mock_session", "true");
@@ -51,8 +48,14 @@ const mockClient = {
         };
       }
     }
+  },
+  signUp: {
+    email: async ({ email, password, name }) => {
+      console.log("Mock Mode: Sign up simulation...");
+      return { data: { user: { name, email } }, error: null };
+    }
   }
 };
 
-// Make sure NEXT_PUBLIC_MOCK_MODE="true" is set in your .env or fallback cleanly to mock here
-export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : mockClient;
+// Fixed: Now cleanly maps to realClient when NEXT_PUBLIC_MOCK_MODE is not "true"
+export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : realClient;
