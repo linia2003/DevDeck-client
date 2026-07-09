@@ -1,155 +1,83 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function Navbar() {
-  const [theme, setTheme] = useState("dark");
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    document.body.setAttribute("data-theme", theme);
-  }, [theme]);
+    const root = document.documentElement;
+    if (isDark) {
+      root.setAttribute("data-theme", "dark");
+    } else {
+      root.setAttribute("data-theme", "light");
+    }
+  }, [isDark]);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  // JS Micro-Interaction Ripple System for Dark Mode Buttons
+  const handleDarkRipple = (e) => {
+    if (!isDark) return; // Light theme handles it natively via CSS conic border draw-in
+    const btn = e.currentTarget;
+    const circle = document.createElement("span");
+    const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+    const radius = diameter / 2;
+
+    const rect = btn.getBoundingClientRect();
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - rect.left - radius}px`;
+    circle.style.top = `${e.clientY - rect.top - radius}px`;
+    circle.classList.add("ripple");
+
+    const ripple = btn.getElementsByClassName("ripple")[0];
+    if (ripple) ripple.remove();
+
+    btn.appendChild(circle);
   };
 
   return (
-    <header className="w-full h-16 border-b border-black/5 dark:border-white/5 px-8 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
-      
-      {/* Brand Logo Identity */}
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#8B5CF6] to-[#6366F1] flex items-center justify-center text-white font-bold text-lg shadow-md">
-            D
-          </div>
-          <span className="font-bold text-lg tracking-tight text-[var(--text-primary)]">DevDeck</span>
-        </div>
-
-        {/* Global Hub Header Links */}
-        <nav className="hidden md:flex items-center gap-1">
-          <button className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#8B5CF6] dark:text-[#A78BDA] bg-purple-500/10">Dashboard</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">My Cards</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Snippets</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Bookmarks</button>
-        </nav>
+    <nav className="w-full py-4 px-8 flex items-center justify-between border-b border-[var(--card-border)] bg-[var(--card-bg)] backdrop-blur-md text-[var(--text-primary)] transition-colors duration-500">
+      <div className="flex items-center gap-2">
+        <span className="text-2xl font-bold tracking-tight">
+          Dev<span>Deck</span>
+        </span>
+        <span className="font-accent-serif text-xs px-2 py-0.5 rounded bg-opacity-10 bg-purple-500 text-[var(--accent-primary)] ml-2">
+          v2.0
+        </span>
       </div>
 
-      {/* Quick Search Bar & Context Control Actions */}
-      <div className="flex items-center gap-4">
-        
-        {/* Search Input Box Layout */}
-        <div className="relative hidden sm:block">
-          <span className="absolute left-3 top-2.5 text-sm opacity-50">🔍</span>
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="w-56 h-9 pl-9 pr-12 text-xs font-medium rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-[var(--text-primary)] focus:outline-none focus:border-purple-500/50 transition-colors"
-          />
-          <kbd className="absolute right-2 top-2 px-1.5 py-0.5 text-[10px] font-sans font-semibold rounded-md bg-black/10 dark:bg-white/10 text-[var(--text-secondary)] border border-black/5 dark:border-white/5">
-            ⌘K
-          </kbd>
-        </div>
-
-        {/* Control Buttons */}
-        <button className="p-2 text-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">🔔</button>
-        
-        {/* Toggle Data Theme Engine */}
-        <button 
-          onClick={toggleTheme} 
-          className="p-2 text-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          title="Toggle System Theme Mode"
+      <div className="flex items-center gap-6">
+        {/* Dynamic Themed Action Button */}
+        <button
+          onClick={handleDarkRipple}
+          className="btn-primary px-6 py-2.5 flex items-center justify-center relative group min-w-[140px]"
         >
-          {theme === "dark" ? "🌙" : "☀️"}
+          {/* Light Theme SVG Perimeter Mask */}
+          {!isDark && (
+            <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0" y="0" width="100%" height="100%" fill="none" rx="12" />
+            </svg>
+          )}
+          <span className="relative z-10 text-sm">Launch Deck</span>
         </button>
 
-        {/* Global Main Add Action Trigger */}
-        <button className="btn-primary text-xs font-bold px-4 h-9 flex items-center gap-1.5">
-          <span>＋</span> Add Card
-        </button>
-
-        {/* User Identity Avatar Ring */}
-        <div className="w-8 h-8 rounded-full bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 flex items-center justify-center text-xs font-bold text-[#8B5CF6] cursor-pointer">
-          A
-        </div>
-      </div>
-    </header>
-  );
-}"use client";
-
-import { useState, useEffect } from "react";
-
-export default function Navbar() {
-  const [theme, setTheme] = useState("dark");
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    document.body.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
-  return (
-    <header className="w-full h-16 border-b border-black/5 dark:border-white/5 px-8 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
-      
-      {/* Brand Logo Identity */}
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#8B5CF6] to-[#6366F1] flex items-center justify-center text-white font-bold text-lg shadow-md">
-            D
-          </div>
-          <span className="font-bold text-lg tracking-tight text-[var(--text-primary)]">DevDeck</span>
-        </div>
-
-        {/* Global Hub Header Links */}
-        <nav className="hidden md:flex items-center gap-1">
-          <button className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#8B5CF6] dark:text-[#A78BDA] bg-purple-500/10">Dashboard</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">My Cards</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Snippets</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Bookmarks</button>
-        </nav>
-      </div>
-
-      {/* Quick Search Bar & Context Control Actions */}
-      <div className="flex items-center gap-4">
-        
-        {/* Search Input Box Layout */}
-        <div className="relative hidden sm:block">
-          <span className="absolute left-3 top-2.5 text-sm opacity-50">🔍</span>
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="w-56 h-9 pl-9 pr-12 text-xs font-medium rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-[var(--text-primary)] focus:outline-none focus:border-purple-500/50 transition-colors"
-          />
-          <kbd className="absolute right-2 top-2 px-1.5 py-0.5 text-[10px] font-sans font-semibold rounded-md bg-black/10 dark:bg-white/10 text-[var(--text-secondary)] border border-black/5 dark:border-white/5">
-            ⌘K
-          </kbd>
-        </div>
-
-        {/* Control Buttons */}
-        <button className="p-2 text-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">🔔</button>
-        
-        {/* Toggle Data Theme Engine */}
-        <button 
-          onClick={toggleTheme} 
-          className="p-2 text-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          title="Toggle System Theme Mode"
+        {/* Theme Toggle Trigger */}
+        <button
+          onClick={() => setIsDark(!isDark)}
+          className="p-2.5 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer shadow-sm"
+          aria-label="Toggle Theme Mood"
         >
-          {theme === "dark" ? "🌙" : "☀️"}
+          {isDark ? (
+            /* Cosmic Sun/Elegant icon */
+            <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14.5 12a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+          ) : (
+            /* Elegant Lavender Crescent Moon icon */
+            <svg className="w-5 h-5 text-purple-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
         </button>
-
-        {/* Global Main Add Action Trigger */}
-        <button className="btn-primary text-xs font-bold px-4 h-9 flex items-center gap-1.5">
-          <span>＋</span> Add Card
-        </button>
-
-        {/* User Identity Avatar Ring */}
-        <div className="w-8 h-8 rounded-full bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 flex items-center justify-center text-xs font-bold text-[#8B5CF6] cursor-pointer">
-          A
-        </div>
       </div>
-    </header>
+    </nav>
   );
 }
