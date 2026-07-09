@@ -2,50 +2,54 @@
 
 @layer base {
   :root {
-    /* Light Theme Settings (Lavender / Soothing Floral Portfolio) */
+    /* ================= LIGHT THEME ================= */
     --bg-base: #faf7f2;
-    --bg-card: #ffffff;
     --text-primary: #2d2a3a;
     --text-secondary: #6b667a;
-    --accent-purple: #8b5cf6;
-    --accent-lavender: #c4b5fd;
-    --accent-blush: #fda4af;
-    --border-card: rgba(228, 222, 211, 0.6);
+    
+    /* Background Image: Soft botanical line-art / warm cream texture */
+    --bg-texture-url: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80');
+    --bg-overlay-opacity: 0.05;
+    
+    /* Card Settings: Solid soft-white cards with gentle shadows */
+    --bg-card: #ffffff;
+    --border-card: rgba(228, 222, 211, 0.7);
     --shadow-card: 0 10px 30px -5px rgba(139, 92, 246, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
     
-    /* Background textures */
-    --bg-texture-url: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80'); /* Soft cream/lavender fluid abstract blobs */
-    --bg-overlay-opacity: 0.06;
+    /* Accent Variables */
+    --accent-primary: #c4b5fd; /* lavender */
+    --accent-secondary: #fda4af; /* blush terracotta */
   }
 
   .dark {
-    /* Dark Theme Settings (Cosmic Cyberpunk Dashboard) */
+    /* ================= DARK THEME ================= */
     --bg-base: #0a0e1a;
-    --bg-card: rgba(18, 23, 43, 0.65);
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --accent-purple: #8b5cf6;
-    --accent-blue: #3b82f6;
-    --accent-orange: #f97316;
+    
+    /* Background Image: Cosmic/Nebula dim particle layout */
+    --bg-texture-url: url('https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1920&q=80');
+    --bg-overlay-opacity: 0.78;
+    
+    /* Card Settings: Cosmic Glassmorphism */
+    --bg-card: rgba(18, 23, 43, 0.65);
     --border-card: rgba(139, 92, 246, 0.2);
     --shadow-card: 0 0 24px rgba(139, 92, 246, 0.15);
     
-    /* Cosmic Background */
-    --bg-texture-url: url('https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1920&q=80'); /* Dark nebula/cosmic field */
-    --bg-overlay-opacity: 0.78;
+    /* Accent Variables */
+    --accent-primary: #8b5cf6; /* purple */
+    --accent-secondary: #3b82f6; /* electric blue */
   }
 
   body {
     background-color: var(--bg-base);
     color: var(--text-primary);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    overflow-x: hidden;
-    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.5s ease, color 0.5s ease;
   }
 }
 
-/* --- THEME ROOT ARCHITECTURE --- */
-.app-shell-bg {
+/* --- App Shell Canvas Layout (Injected under the UI layout) --- */
+.app-theme-bg-canvas {
   position: fixed;
   inset: 0;
   z-index: -10;
@@ -54,132 +58,72 @@
   background-position: center;
   filter: blur(8px);
   transform: scale(1.02);
-  transition: background-image 0.8s ease-in-out;
+  transition: background-image 0.6s ease-in-out;
 }
 
-.app-shell-overlay {
+.app-theme-bg-overlay {
   position: fixed;
   inset: 0;
   z-index: -9;
   background-color: var(--bg-base);
   opacity: var(--bg-overlay-opacity);
-  transition: background-color 0.6s ease, opacity 0.6s ease;
+  transition: background-color 0.5s ease, opacity 0.5s ease;
 }
 
-/* --- TYPOGRAPHY SHIFT --- */
-.font-accent-serif {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-style: italic;
+/* --- Master Card Theme Adaptor --- */
+.devdeck-theme-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-card) !important;
+  box-shadow: var(--shadow-card) !important;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-/* --- DARK THEME: Glassmorphism Cards & Glowing Accents --- */
-.dark .theme-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-card);
-  box-shadow: var(--shadow-card);
-  border-radius: 16px;
-  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+/* Glassmorphism interactive glow on dark mode hover */
+.dark .devdeck-theme-card:hover {
+  box-shadow: 0 0 32px rgba(139, 92, 246, 0.25) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
 }
 
-.dark .theme-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 32px rgba(139, 92, 246, 0.3), 0 0 12px rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-/* --- LIGHT THEME: Soothing Organic Cards --- */
-.theme-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
-  box-shadow: var(--shadow-card);
-  border-radius: 24px;
-  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
-}
-
-.theme-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.12);
-}
-
-/* --- TEXT GRADIENTS --- */
-.gradient-text-dark {
-  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #f97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gradient-text-light {
-  background: linear-gradient(135deg, #a78bfa 0%, #fda4af 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* --- DARK MODE: RIPPLE BUTTONS --- */
-.dark .btn-primary-theme {
+/* --- Dynamic Button Micro-Interactions --- */
+.devdeck-theme-btn {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 4px 14px rgba(13b, 92, 246, 0.4);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  transition: all 0.4s ease;
 }
 
-.dark .btn-primary-theme:hover {
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-  transform: translateY(-1px);
+/* Dark: Filled Gradient with Hover Glow */
+.dark .devdeck-theme-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+.dark .devdeck-theme-btn:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
 }
 
-.ripple-span {
+/* Light: Outlined/Ghost style drawing border properties */
+.devdeck-theme-btn {
+  background: transparent;
+  color: #6d28d9;
+  border: 2px solid var(--accent-primary) !important;
+}
+.devdeck-theme-btn:hover {
+  background-color: rgba(196, 181, 253, 0.2) !important;
+  border-color: var(--accent-secondary) !important;
+}
+
+/* Pure JS Ripple Spawner for Dark Mode */
+.theme-ripple {
   position: absolute;
   border-radius: 50%;
   transform: scale(0);
-  animation: ripple-effect 0.6s linear;
-  background-color: rgba(255, 255, 255, 0.35);
+  animation: ripple-anim 0.5s linear;
+  background-color: rgba(255, 255, 255, 0.3);
   pointer-events: none;
 }
-
-@keyframes ripple-effect {
+@keyframes ripple-anim {
   to {
     transform: scale(4);
     opacity: 0;
   }
-}
-
-/* --- LIGHT MODE: SVG DRAW-IN BORDER BUTTONS --- */
-.btn-primary-theme {
-  position: relative;
-  background: transparent;
-  color: #6d28d9;
-  font-weight: 600;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: fill 0.4s ease, color 0.4s ease, background-color 0.4s ease;
-}
-
-.btn-primary-theme:hover {
-  background-color: rgba(196, 181, 253, 0.25);
-  color: #4c1d95;
-}
-
-.btn-primary-theme svg rect {
-  stroke: #c4b5fd;
-  stroke-width: 2;
-  stroke-dasharray: 400;
-  stroke-dashoffset: 400;
-  transition: stroke-dashoffset 0.6s linear;
-}
-
-.btn-primary-theme:hover svg rect {
-  stroke-dashoffset: 0;
-  stroke: #a78bfa;
-}
-
-/* --- GLOWING DATA VISUALIZATIONS --- */
-.dark .glow-stroke {
-  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.7));
 }
