@@ -1,15 +1,24 @@
 // src/lib/auth-client.js
 import { createAuthClient } from "better-auth/react";
 
-// 1. Core initialization for connected server execution environments
-const realClient = typeof window !== "undefined" 
-  ? createAuthClient({ baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000" })
-  : null;
+const getBaseURL = () => {
+  
+  if (typeof window !== "undefined") {
+    return window.location.origin; 
+  }
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+};
 
-// 2. Safe frontend isolation mock engine with explicit credential validation
+const realClient = createAuthClient({ 
+  baseURL: getBaseURL(),
+  fetchOptions: {
+    credentials: "include", 
+  }
+});
+
+// Safe frontend isolation mock engine with dynamic parameters (used only when NEXT_PUBLIC_MOCK_MODE=true)
 const mockClient = {
   useSession: () => {
-    // Check if a mock session token exists in client storage to persist login state
     const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("devdeck_mock_session") === "true";
     
     return {
@@ -17,7 +26,7 @@ const mockClient = {
         user: {
           name: "Muna Nemme",
           email: "munanemme@gmail.com",
-          image: "https://api.dicebear.com/7.x/open-peeps/svg?seed=AlexDevDeck"
+          image: `https://api.dicebear.com/7.x/open-peeps/svg?seed=AlexDevDeck`
         }
       } : null,
       isPending: false,
@@ -34,8 +43,6 @@ const mockClient = {
   signIn: {
     email: async ({ email, password }) => {
       console.log("Mock Mode: Intercepting credential validation loop...");
-      
-      // Enforce the requested frontend-only base credentials
       if (email === "devdeck@gmail.com" && password === "12345678") {
         if (typeof window !== "undefined") {
           localStorage.setItem("devdeck_mock_session", "true");
@@ -51,8 +58,14 @@ const mockClient = {
         };
       }
     }
+  },
+  signUp: {
+    email: async ({ email, password, name }) => {
+      console.log("Mock Mode: Sign up simulation...");
+      return { data: { user: { name, email } }, error: null };
+    }
   }
 };
 
-// Make sure NEXT_PUBLIC_MOCK_MODE="true" is set in your .env or fallback cleanly to mock here
-export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : mockClient;
+// Dynamically exports the appropriate client engine depending strictly on environment configuration
+export const authClient = process.env.NEXT_PUBLIC_MOCK_MODE === "true" ? mockClient : realClient;

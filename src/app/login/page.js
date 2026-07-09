@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; // Integrated Link component for router mapping
+import Link from "next/link"; 
 import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
@@ -39,8 +39,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 relative">
-      
-      {/* Immersive Panoramic Cinematic Background Image */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
@@ -50,10 +48,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[#0B0E14]/40 backdrop-brightness-[0.75] dark:backdrop-brightness-[0.45]" />
       </div>
 
-      {/* Frosted Entry Terminal Card Floating On Top */}
       <div className="w-full max-w-md rounded-2xl border border-[rgba(20,20,40,0.12)] dark:border-white/10 bg-white/70 dark:bg-[#1A1D29]/65 backdrop-blur-glass p-8 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative z-10">
-        
-        {/* Terminal Header Identity */}
         <div className="text-center mb-6">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-[#db61ad] to-[#861e60] text-white shadow-[0_0_15px_rgba(233,79,209,0.4)] mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -64,19 +59,15 @@ export default function LoginPage() {
           <h2 className="text-xl font-bold uppercase tracking-wider text-[#1A1D29] dark:text-[#F5F6FA]">
              Initialization
           </h2>
-          
         </div>
 
-        {/* Action Form Handler */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {error && (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-center text-xs font-semibold uppercase tracking-wider text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.1)]">
               {error}
             </div>
           )}
 
-          {/* Email Input Field */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#5B5F72] dark:text-[#9CA3B5] mb-1.5">
              Type your email here
@@ -91,7 +82,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Password Input Field */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#5B5F72] dark:text-[#9CA3B5] mb-1.5">
               Type your password here
@@ -106,7 +96,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Access Request Execution Button */}
           <button
             type="submit"
             disabled={loading}
@@ -114,10 +103,8 @@ export default function LoginPage() {
           >
             {loading ? "Verifying information..." : "Initializing account"}
           </button>
-
         </form>
 
-        {/* Dynamic Contextual Auth Switch Link */}
         <div className="mt-5 text-center">
           <p className="text-xs text-[#5B5F72] dark:text-[#9CA3B5]">
             No account yet?{" "}
@@ -127,7 +114,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Hardcoded Staging Environment Notice */}
         <div className="mt-5 pt-4 border-t border-[rgba(20,20,40,0.1)] dark:border-white/5 text-center">
           <p className="text-[10px] font-medium uppercase tracking-wider text-[#5B5F72] dark:text-[#9CA3B5]">
             "hardcoded email and password since its not connected to backend yet "
@@ -136,7 +122,6 @@ export default function LoginPage() {
             devdeck@gmail.com // 12345678
           </p>
         </div>
-
       </div>
     </div>
   );
