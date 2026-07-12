@@ -1,0 +1,440 @@
+"use client";
+
+import React, { useState } from "react";
+
+import { 
+  Link as LinkIcon, 
+  LogoGithub, 
+  Code as CodeIcon, 
+  Text as NoteIcon, 
+  Thunderbolt as ApiIcon, 
+  Bulb as IdeaIcon 
+} from "@gravity-ui/icons";
+
+export default function CreateCardModal({ isOpen, onClose, onSave }) {
+  const [activeTab, setActiveTab] = useState("links");
+  const [formData, setFormData] = useState({
+    url: "",
+    title: "",
+    notes: "",
+    repoUrl: "",
+    customLabel: "",
+    language: "javascript",
+    code: "",
+    purpose: "",
+    noteTitle: "",
+    markdownContent: "",
+    apiMethod: "GET",
+    apiUrl: "",
+    apiAuth: [],
+    ideaTitle: "",
+    ideaStatus: "draft"
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    let currentErrors = {};
+
+    if (activeTab === "links") {
+      if (!formData.url) {
+        currentErrors.url = "We need a valid link to point your card to.";
+      } else if (!/^https?:\/\/\S+/.test(formData.url)) {
+        currentErrors.url = "That layout doesn't look like a real URL setup.";
+      }
+      if (!formData.title) currentErrors.title = "Give it a short, descriptive name so it's easy to spot.";
+    }
+
+    if (activeTab === "repos") {
+      if (!formData.repoUrl) {
+        currentErrors.repoUrl = "We need a repository link to capture this.";
+      } else if (!formData.repoUrl.includes("github.com")) {
+        currentErrors.repoUrl = "That doesn't look like a valid GitHub repository URL.";
+      }
+    }
+
+    if (activeTab === "snippets") {
+      if (!formData.language) currentErrors.language = "Pick a language framework so syntax engines can shine.";
+      if (!formData.code) currentErrors.code = "A snippet card needs some code to hold onto!";
+    }
+
+    if (activeTab === "notes") {
+      if (!formData.noteTitle) currentErrors.noteTitle = "Every great entry needs a headline.";
+      if (!formData.markdownContent) currentErrors.markdownContent = "Don't leave the thoughts canvas entirely blank.";
+    }
+
+    if (activeTab === "apis") {
+      if (!formData.apiUrl) {
+        currentErrors.apiUrl = "Where are we targeting? An endpoint URL route is mandatory.";
+      } else if (!/^https?:\/\/\S+/.test(formData.apiUrl)) {
+        currentErrors.apiUrl = "Ensure your API endpoint starts with http:// or https://";
+      }
+    }
+
+    if (activeTab === "ideas") {
+      if (!formData.ideaTitle) currentErrors.ideaTitle = "What's the spark called? Name your vision.";
+    }
+
+    setErrors(currentErrors);
+    return Object.keys(currentErrors).length === 0;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field] : null }));
+    }
+  };
+
+  const handleCheckboxChange = (value) => {
+    let updatedAuth = [...formData.apiAuth];
+    if (updatedAuth.includes(value)) {
+      updatedAuth = updatedAuth.filter((item) => item !== value);
+    } else {
+      updatedAuth.push(value);
+    }
+    setFormData((prev) => ({ ...prev, apiAuth: updatedAuth }));
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onSave({ type: activeTab, data: formData });
+      onClose();
+    }
+  };
+
+  const getGlowColorClass = () => {
+    switch(activeTab) {
+      case "links": return "shadow-[0_0_40px_rgba(63,224,197,0.15)]";
+      case "repos": return "shadow-[0_0_40px_rgba(139,92,246,0.15)]";
+      case "snippets": return "shadow-[0_0_40px_rgba(233,79,209,0.15)]";
+      case "notes": return "shadow-[0_0_40px_rgba(255,184,77,0.15)]";
+      case "apis": return "shadow-[0_0_40px_rgba(63,224,197,0.15)]";
+      case "ideas": return "shadow-[0_0_40px_rgba(233,79,209,0.15)]";
+      default: return "shadow-[0_0_40px_rgba(255,255,255,0.05)]";
+    }
+  };
+
+  if (!isOpen) return null;
+
+  const navTabs = [
+    { id: "links", label: "Link", icon: <LinkIcon className="w-[18px] h-[18px]" /> },
+    { id: "repos", label: "Repo", icon: <LogoGithub className="w-[18px] h-[18px]" /> },
+    { id: "snippets", label: "Snippet", icon: <CodeIcon className="w-[18px] h-[18px]" /> },
+    { id: "notes", label: "Note", icon: <NoteIcon className="w-[18px] h-[18px]" /> },
+    { id: "apis", label: "API", icon: <ApiIcon className="w-[18px] h-[18px]" /> },
+    { id: "ideas", label: "Idea", icon: <IdeaIcon className="w-[18px] h-[18px]" /> }
+  ];
+
+  // Tailored interactive input classes matching Design System Guidelines
+  const inputBaseClass = "w-full bg-[#1A1D29]/60 backdrop-blur-md text-[#F5F6FA] placeholder:#9CA3B5/40 border border-white/8 hover:border-white/20 focus:border-[#E94FD1]/80 focus:outline-none rounded-xl h-11 px-4 transition-all duration-300";
+  const textareaBaseClass = "w-full bg-[#1A1D29]/60 backdrop-blur-md text-[#F5F6FA] placeholder:#9CA3B5/40 border border-white/8 hover:border-white/20 focus:border-[#E94FD1]/80 focus:outline-none rounded-xl p-4 transition-all duration-300 min-h-[100px]";
+  const labelClass = "text-[#9CA3B5] font-medium mb-1.5 block text-sm";
+  const errorClass = "text-xs text-rose-500 mt-1.5 font-normal";
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      {/* Frosted Background Mask Layer */}
+      <div 
+        className="fixed inset-0 bg-[#0B0E14]/70 backdrop-blur-md transition-opacity duration-300"
+        onClick={onClose}
+      />
+
+      {/* Futuristic Glass HUD Container Frame */}
+      <div className={`bg-[#12141C]/90 backdrop-filter backdrop-blur-xl border border-white/8 rounded-2xl ${getGlowColorClass()} transition-shadow duration-500 max-h-[90vh] overflow-y-auto p-6 text-[#F5F6FA] relative w-full max-w-2xl z-10 flex flex-col gap-6`}>
+        
+        {/* Modal Header */}
+        <div className="border-b border-white/6 pb-4 flex flex-col gap-1">
+          <h2 className="text-xl font-medium tracking-wide">Add a Card to Workspace</h2>
+          <p className="text-sm text-[#9CA3B5] font-normal">Expand your dashboard ecosystem by storing a new unit.</p>
+        </div>
+
+        {/* Modal Body */}
+        <div className="flex flex-col gap-6">
+          
+          {/* Custom Glass Pill Selector Layout Navigation */}
+          <div className="bg-white/5 backdrop-blur-sm p-1 border border-white/6 rounded-full w-full flex justify-between items-center gap-1">
+            {navTabs.map((tab) => {
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setErrors({});
+                  }}
+                  type="button"
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+                    isSelected 
+                      ? "bg-gradient-to-r from-[#E94FD1] to-[#FF6FB5] text-white shadow-lg shadow-pink-500/20" 
+                      : "text-[#9CA3B5] hover:text-[#F5F6FA] hover:bg-white/5"
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          
+          {activeTab === "links" && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[#3FE0C5] bg-[#3FE0C5]/10 px-3 py-1.5 rounded-lg w-fit border border-[#3FE0C5]/20 font-medium">
+                Quick-save a documentation page, tool, or guide.
+              </p>
+              <div>
+                <label className={labelClass}>Website URL</label>
+                <input
+                  type="text"
+                  placeholder="https://example.com/docs"
+                  value={formData.url}
+                  onChange={(e) => handleInputChange("url", e.target.value)}
+                  className={`${inputBaseClass} ${errors.url ? "border-rose-500/60 focus:border-rose-500" : ""}`}
+                />
+                {errors.url && <p className={errorClass}>{errors.url}</p>}
+              </div>
+              <div>
+                <label className={labelClass}>Deck Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Tailwind Cheat Sheet"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  className={`${inputBaseClass} ${errors.title ? "border-rose-500/60 focus:border-rose-500" : ""}`}
+                />
+                {errors.title && <p className={errorClass}>{errors.title}</p>}
+              </div>
+              <div>
+                <label className={labelClass}>Quick Notes</label>
+                <textarea
+                  placeholder="Why are you saving this? (e.g., Useful for flexbox setups)"
+                  value={formData.notes}
+                  onChange={(e) => handleInputChange("notes", e.target.value)}
+                  className={textareaBaseClass}
+                />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "repos" && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[#8B5CF6] bg-[#8B5CF6]/10 px-3 py-1.5 rounded-lg w-fit border border-[#8B5CF6]/20 font-medium">
+                Track an upstream dependency, tool, or open-source inspiration.
+              </p>
+              <div>
+                <label className={labelClass}>Repository URL</label>
+                <input
+                  type="text"
+                  placeholder="https://github.com/username/repo"
+                  value={formData.repoUrl}
+                  onChange={(e) => handleInputChange("repoUrl", e.target.value)}
+                  className={`${inputBaseClass} ${errors.repoUrl ? "border-rose-500/60 focus:border-rose-500" : ""}`}
+                />
+                {errors.repoUrl && <p className={errorClass}>{errors.repoUrl}</p>}
+              </div>
+              <div>
+                <label className={labelClass}>Custom Label</label>
+                <input
+                  type="text"
+                  placeholder="Leave blank to use the repository's original name"
+                  value={formData.customLabel}
+                  onChange={(e) => handleInputChange("customLabel", e.target.value)}
+                  className={inputBaseClass}
+                />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "snippets" && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[#E94FD1] bg-[#E94FD1]/10 px-3 py-1.5 rounded-lg w-fit border border-[#E94FD1]/20 font-medium">
+                Save a reusable block of magic code.
+              </p>
+              
+              <div>
+                <label className={labelClass}>Language Syntax</label>
+                <select
+                  value={formData.language}
+                  onChange={(e) => handleInputChange("language", e.target.value)}
+                  className="w-full bg-[#1A1D29]/60 text-[#F5F6FA] border border-white/8 hover:border-white/20 focus:border-[#E94FD1]/80 focus:outline-none rounded-xl h-11 px-3 backdrop-blur-md transition-all duration-300"
+                >
+                  <option value="javascript">JavaScript</option>
+                  <option value="typescript">TypeScript</option>
+                  <option value="python">Python</option>
+                  <option value="rust">Rust</option>
+                  <option value="go">Go Lang</option>
+                  <option value="css">CSS / Tailwind</option>
+                </select>
+                {errors.language && <p className={errorClass}>{errors.language}</p>}
+              </div>
+
+              <div>
+                <label className={labelClass}>The Code</label>
+                <textarea
+                  placeholder="paste your code block here..."
+                  value={formData.code}
+                  onChange={(e) => handleInputChange("code", e.target.value)}
+                  className={`${textareaBaseClass} font-mono text-xs bg-black/20 min-h-[140px]`}
+                />
+                {errors.code && <p className={errorClass}>{errors.code}</p>}
+              </div>
+              <div>
+                <label className={labelClass}>Purpose</label>
+                <input
+                  type="text"
+                  placeholder="What does this script solve?"
+                  value={formData.purpose}
+                  onChange={(e) => handleInputChange("purpose", e.target.value)}
+                  className={inputBaseClass}
+                />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "notes" && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[#FFB84D] bg-[#FFB84D]/10 px-3 py-1.5 rounded-lg w-fit border border-[#FFB84D]/20 font-medium">
+                Brainstorm, document setups, or write long-form scratchpads.
+              </p>
+              <div>
+                <label className={labelClass}>Note Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Production Deployment Checklist"
+                  value={formData.noteTitle}
+                  onChange={(e) => handleInputChange("noteTitle", e.target.value)}
+                  className={`${inputBaseClass} ${errors.noteTitle ? "border-rose-500/60 focus:border-rose-500" : ""}`}
+                />
+                {errors.noteTitle && <p className={errorClass}>{errors.noteTitle}</p>}
+              </div>
+              <div>
+                <label className={labelClass}>Workspace Editor</label>
+                <textarea
+                  placeholder="# Start writing here... use markdown syntax for headers, lists, and bold text."
+                  value={formData.markdownContent}
+                  onChange={(e) => handleInputChange("markdownContent", e.target.value)}
+                  className={`${textareaBaseClass} min-h-[180px]`}
+                />
+                {errors.markdownContent && <p className={errorClass}>{errors.markdownContent}</p>}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "apis" && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[#3FE0C5] bg-[#3FE0C5]/10 px-3 py-1.5 rounded-lg w-fit border border-[#3FE0C5]/20 font-medium">
+                Log a critical endpoint configuration for quick testing or reference.
+              </p>
+              <div className="flex gap-3 items-end">
+                <div className="w-32">
+                  <label className={labelClass}>Method</label>
+                  <select
+                    value={formData.apiMethod}
+                    onChange={(e) => handleInputChange("apiMethod", e.target.value)}
+                    className="w-full bg-[#1A1D29]/60 text-[#F5F6FA] border border-white/8 hover:border-white/20 focus:border-[#E94FD1]/80 focus:outline-none rounded-xl h-11 px-3 backdrop-blur-md transition-all duration-300 font-bold"
+                  >
+                    <option value="GET" className="text-emerald-400">GET</option>
+                    <option value="POST" className="text-sky-400">POST</option>
+                    <option value="PUT" className="text-amber-400">PUT</option>
+                    <option value="PATCH" className="text-orange-400">PATCH</option>
+                    <option value="DELETE" className="text-rose-500">DELETE</option>
+                  </select>
+                </div>
+
+                <div className="flex-1">
+                  <label className={labelClass}>Endpoint Route URL</label>
+                  <input
+                    type="text"
+                    placeholder="https://api.devdeck.com/v1/auth/user"
+                    value={formData.apiUrl}
+                    onChange={(e) => handleInputChange("apiUrl", e.target.value)}
+                    className={`${inputBaseClass} ${errors.apiUrl ? "border-rose-500/60 focus:border-rose-500" : ""}`}
+                  />
+                </div>
+              </div>
+              {errors.apiUrl && <p className={errorClass}>{errors.apiUrl}</p>}
+
+              <div className="mt-2">
+                <label className="text-[#9CA3B5] text-sm font-medium mb-3 block">Authentication Requirements</label>
+                <div className="flex flex-wrap gap-4">
+                  {["none", "bearer", "apikey", "basic"].map((authType) => (
+                    <label key={authType} className="flex items-center gap-2 cursor-pointer select-none text-sm font-normal text-[#F5F6FA]">
+                      <input
+                        type="checkbox"
+                        checked={formData.apiAuth.includes(authType)}
+                        onChange={() => handleCheckboxChange(authType)}
+                        className="rounded border-white/10 bg-white/5 text-[#E94FD1] focus:ring-0 focus:ring-offset-0 w-4 h-4 cursor-pointer"
+                      />
+                      <span className="capitalize">{authType === "apikey" ? "API Key" : authType === "bearer" ? "Bearer Token" : authType}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "ideas" && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[#E94FD1] bg-[#E94FD1]/10 px-3 py-1.5 rounded-lg w-fit border border-[#E94FD1]/20 font-medium">
+                Don't let that late-night spark fade away. Draft it down.
+              </p>
+              <div>
+                <label className={labelClass}>The Big Idea</label>
+                <input
+                  type="text"
+                  placeholder="e.g., An AI-powered git commit summarizer"
+                  value={formData.ideaTitle}
+                  onChange={(e) => handleInputChange("ideaTitle", e.target.value)}
+                  className={`${inputBaseClass} ${errors.ideaTitle ? "border-rose-500/60 focus:border-rose-500" : ""}`}
+                />
+                {errors.ideaTitle && <p className={errorClass}>{errors.ideaTitle}</p>}
+              </div>
+
+              <div className="mt-2">
+                <label className="text-[#9CA3B5] text-sm font-medium mb-3 block">Current Momentum</label>
+                <div className="flex gap-6">
+                  {[
+                    { val: "draft", label: "Just a Draft 🧊" },
+                    { val: "coding", label: "Actively Coding 🪵" },
+                    { val: "shipped", label: "Shipped & Done 🎉" }
+                  ].map((statusItem) => (
+                    <label key={statusItem.val} className="flex items-center gap-2 cursor-pointer select-none text-sm font-normal text-[#F5F6FA]">
+                      <input
+                        type="radio"
+                        name="ideaStatus"
+                        value={statusItem.val}
+                        checked={formData.ideaStatus === statusItem.val}
+                        onChange={() => handleInputChange("ideaStatus", statusItem.val)}
+                        className="border-white/10 bg-white/5 text-[#E94FD1] focus:ring-0 focus:ring-offset-0 w-4 h-4 cursor-pointer"
+                      />
+                      <span>{statusItem.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="border-t border-white/6 pt-4 flex justify-end gap-3">
+          <button 
+            type="button"
+            onClick={onClose}
+            className="text-[#9CA3B5] hover:text-[#F5F6FA] hover:bg-white/5 font-medium transition-colors rounded-full px-6 py-2 text-sm bg-transparent border-0 outline-none cursor-pointer"
+          >
+            Nevermind
+          </button>
+          <button 
+            type="button"
+            onClick={handleSubmit}
+            className="bg-gradient-to-r from-[#E94FD1] to-[#FF6FB5] text-white font-medium shadow-[0_4px_20px_rgba(233,79,209,0.4)] hover:shadow-[0_4px_25px_rgba(233,79,209,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-full px-6 py-2 text-sm border-0 outline-none cursor-pointer"
+          >
+            Add to Deck
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}

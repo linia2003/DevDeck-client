@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
 import { useSidebar } from "@/context/SidebarContext";
 import { 
   FolderPlus, 
@@ -9,7 +10,7 @@ import {
   Clock, 
   Tag, 
   Settings,
-  Menu // Menu icon integrated inside the sidebar header
+  Menu 
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -61,10 +62,12 @@ export default function Sidebar() {
               {!isSidebarCollapsed && <span className="whitespace-nowrap text-white/90">Favorites</span>}
             </a>
 
-            <a href="#recent" className="flex items-center gap-4 px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition-all duration-200 group">
-              <Clock size={20} className="group-hover:scale-110 transition-transform duration-200 text-mauve" />
-              {!isSidebarCollapsed && <span className="whitespace-nowrap text-white/90">Recent</span>}
-            </a>
+            <nav>
+              <a href="#recent" className="flex items-center gap-4 px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition-all duration-200 group">
+                <Clock size={20} className="group-hover:scale-110 transition-transform duration-200 text-mauve" />
+                {!isSidebarCollapsed && <span className="whitespace-nowrap text-white/90">Recent</span>}
+              </a>
+            </nav>
 
             <a href="#tags" className="flex items-center gap-4 px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition-all duration-200 group">
               <Tag size={20} className="group-hover:scale-110 transition-transform duration-200 text-rosepink/80" />
@@ -73,12 +76,15 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        {/* Bottom Panel Settings Shortcut */}
+        {/* Bottom Panel Settings Shortcut (Connected with Next.js Link Engine) */}
         <div className="border-t border-white/10 pt-4 mb-4">
-          <a href="#settings" className="flex items-center gap-4 px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition-all duration-200 group">
+          <Link 
+            href="/settings" 
+            className="flex items-center gap-4 px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition-all duration-200 group"
+          >
             <Settings size={20} className="group-hover:rotate-45 transition-transform duration-300 ease-out text-white/70" />
             {!isSidebarCollapsed && <span className="whitespace-nowrap text-white/90">Settings</span>}
-          </a>
+          </Link>
         </div>
 
       </div>
