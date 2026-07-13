@@ -81,7 +81,7 @@ export default function HomePage() {
                     </linearGradient>
                   </defs>
                 </svg>
-                <span className="absolute text-xs font-mono font-bold text-white">75%</span>
+                <span className="absolute text-xs font-mono font-bold text-white">0%</span>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Deck Integrity</p>

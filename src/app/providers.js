@@ -10,19 +10,17 @@ export default function Providers({ children }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
-  // Safely sync client rendering status to prevent hydration mismatch flashes
+  // This effect ensures that the component is only rendered on the client side after hydration, preventing any server-side rendering issues.
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Identify auth views to selectively exclude general dashboard controls
+  // Hide the global headers/footers on both the Login and Register screens
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
   return (
     <SidebarProvider>
-      {/* The context provider wraps everything unconditionally so 'useSidebar()' 
-        never throws an undefined error down the component tree.
-      */}
+      {/* Only mount the Navbar when not on auth pages and after client hydration */}
       {!isAuthPage && mounted && <Navbar />}
       
       <div className="flex min-h-screen">
