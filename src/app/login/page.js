@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; 
 import { authClient } from "@/lib/auth-client";
+import { ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,33 +13,32 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const { data, error: authError } = await authClient.signIn.email({
-      email,
-      password,
-    });
+    try {
+      const { data, error: authError } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    if (authError) {
-      setError(authError.message);
-    } else {
-      // Connect successfully verified profile handles straight to the matrix view panel
-      router.push("/dashboard");
-      router.refresh();
+      if (authError) {
+        setError(authError.message);
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (err) {
+      setError("An unexpected system connection anomaly occurred.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError("An unexpected system connection anomaly occurred.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 relative">
+    <div className="min-h-[100vh] flex items-center justify-center px-4 relative bg-[#0B0E14]">
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
@@ -48,8 +48,18 @@ const handleSubmit = async (e) => {
         <div className="absolute inset-0 bg-[#0B0E14]/40 backdrop-brightness-[0.75] dark:backdrop-brightness-[0.45]" />
       </div>
 
-      <div className="w-full max-w-md rounded-2xl border border-[rgba(20,20,40,0.12)] dark:border-white/10 bg-white/70 dark:bg-[#1A1D29]/65 backdrop-blur-glass p-8 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative z-10">
-        <div className="text-center mb-6">
+      <div className="w-full max-w-md rounded-2xl border border-[rgba(20,20,40,0.12)] dark:border-white/10 bg-white/70 dark:bg-[#1A1D29]/65 backdrop-blur-xl p-8 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative z-10">
+        
+        {/* Sleek Floating Back To Landing Navigation Action */}
+        <Link 
+          href="/" 
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#5B5F72] dark:text-[#9CA3B5] hover:text-[#1A1D29] dark:hover:text-white transition-all group"
+        >
+          <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back</span>
+        </Link>
+
+        <div className="text-center mb-6 mt-4">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-[#db61ad] to-[#861e60] text-white shadow-[0_0_15px_rgba(233,79,209,0.4)] mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
