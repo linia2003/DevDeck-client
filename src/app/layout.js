@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import LayoutClientWrapper from "@/components/LayoutClientWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +22,8 @@ export default function RootLayout({ children }) {
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0B0E14]`}>
         <Providers>
-          {/* 
-            This is the ONLY wrapper that should handle rendering logic.
-            Ensure NO SidebarContainer or Navbar components are typed here!
-          */}
-          <LayoutClientWrapper>{children}</LayoutClientWrapper>
+          {/* RENDER RAW CHILDREN HERE ONLY. Public pages load completely clean. */}
+          {children}
         </Providers>
       </body>
     </html>

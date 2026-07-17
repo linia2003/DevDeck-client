@@ -1,20 +1,31 @@
-import SidebarContainer from "@/components/SidebarContainer";
-import Navbar from "@/components/Navbar";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Providers from "./providers";
 
-export default function DashboardLayout({ children }) {
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata = {
+  title: "DevDeck — Developer Workspace Organizer",
+  description: "A personalized, web-based developer workspace dashboard.",
+};
+
+export default function RootLayout({ children }) {
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0B0E14]">
-      {/* The sidebar panel lives explicitly inside this group configuration only */}
-      <SidebarContainer />
-      
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Protected header navigation panel */}
-        <Navbar />
-        
-        <main className="flex-1 overflow-y-auto p-6 text-[#F5F6FA]">
+    <html lang="en" className="dark">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0B0E14]`}>
+        <Providers>
+          {/* RENDER RAW children HERE ONLY. Public pages will load fully clean now. */}
           {children}
-        </main>
-      </div>
-    </div>
+        </Providers>
+      </body>
+    </html>
   );
 }
