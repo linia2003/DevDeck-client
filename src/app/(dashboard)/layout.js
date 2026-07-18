@@ -7,10 +7,20 @@ import { useSidebar } from "@/context/SidebarContext";
 
 export default function DashboardLayout({ children }) {
   const { isSidebarCollapsed } = useSidebar();
-  const [isDark, setIsDark] = useState(true);
+  
+  // 🔑 FIX 1: Safely check if window is defined (SSR safety) and initialize 
+  // based on the REAL presence of the 'dark' class instead of forcing 'true'
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains('dark');
+    }
+    return true; // Fallback for Server-Side Rendering
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
+    
+    // Explicit sync check right on mount to capture theme toggle clicks
     setIsDark(root.classList.contains('dark'));
 
     const observer = new MutationObserver(() => {
@@ -28,7 +38,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex h-screen w-screen overflow-hidden relative font-sans antialiased text-[#1A1D29] dark:text-[#F5F6FA] transition-colors duration-300">
       
-      {/* 100% SHARP BACKDROP IMAGES — FROST REMOVED FROM BACKGROUND LAYER */}
+      {/* 100% SHARP BACKDROP IMAGES */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
         
         {/* Light Mode Wallpaper — Zero Blur */}
@@ -37,7 +47,6 @@ export default function DashboardLayout({ children }) {
             className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed animate-fade-in"
             style={{ backgroundImage: `url('https://i.pinimg.com/1200x/58/c9/0f/58c90fc7915681c2894fb639a19ec5e3.jpg')` }}
           >
-            {/* Minimal tint overlay just to balance theme color without dulling the graphic */}
             <div className="absolute inset-0 bg-[#F4F5FA]/15" />
           </div>
         )}
@@ -48,7 +57,6 @@ export default function DashboardLayout({ children }) {
             className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed animate-fade-in"
             style={{ backgroundImage: `url('https://i.pinimg.com/736x/67/e9/60/67e960e46c4010b585d4eac3f4382654.jpg')` }}
           >
-            {/* Minimal dark overlay to ensure text contrast while keeping background graphic completely sharp */}
             <div className="absolute inset-0 bg-[#0B0E14]/25" />
             <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#E94FD1] opacity-[0.15] blur-[160px]" />
             <div className="absolute bottom-[5%] left-[-5%] w-[550px] h-[550px] rounded-full bg-[#3FE0C5] opacity-[0.12] blur-[180px]" />

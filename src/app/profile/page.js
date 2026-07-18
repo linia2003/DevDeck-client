@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
   // Sync session configurations post-hydration
   useEffect(() => {
-    if (mounted && !isPending && !session) {
+    if (mounted && !isPending && !session && !loading) {
       router.push("/login");
     } else if (session?.user) {
       setName(session.user.name || "");
@@ -33,7 +33,7 @@ export default function ProfilePage() {
       const match = session.user.image?.match(/seed=([^&]+)/);
       setAvatarSeed(match ? decodeURIComponent(match[1]) : session.user.name || "default");
     }
-  }, [session, isPending, router, mounted]);
+  }, [session, isPending, router, mounted, loading]);
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -54,9 +54,9 @@ export default function ProfilePage() {
       } else {
         setMessage({ type: "success", text: "Profile updated! Redirecting to dashboard..." });
         
-        // Automatically route back to the dashboard panel after a brief 1-second delay
+        // Automatically route back to the dashboard panel layout instead of root landing page
         setTimeout(() => {
-          router.push("/");
+          router.push("/dashboard");
           router.refresh();
         }, 1000);
       }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { X } from "lucide-react";
 
 import { 
   Link as LinkIcon, 
@@ -126,7 +127,6 @@ export default function CreateCardModal({ isOpen, onClose, onSave }) {
     { id: "ideas", label: "Idea", icon: <IdeaIcon className="w-[18px] h-[18px]" /> }
   ];
 
-  // Tailored interactive input classes matching Design System Guidelines
   const inputBaseClass = "w-full bg-[#1A1D29]/60 backdrop-blur-md text-[#F5F6FA] placeholder:#9CA3B5/40 border border-white/8 hover:border-white/20 focus:border-[#E94FD1]/80 focus:outline-none rounded-xl h-11 px-4 transition-all duration-300";
   const textareaBaseClass = "w-full bg-[#1A1D29]/60 backdrop-blur-md text-[#F5F6FA] placeholder:#9CA3B5/40 border border-white/8 hover:border-white/20 focus:border-[#E94FD1]/80 focus:outline-none rounded-xl p-4 transition-all duration-300 min-h-[100px]";
   const labelClass = "text-[#9CA3B5] font-medium mb-1.5 block text-sm";
@@ -143,8 +143,18 @@ export default function CreateCardModal({ isOpen, onClose, onSave }) {
       {/* Futuristic Glass HUD Container Frame */}
       <div className={`bg-[#12141C]/90 backdrop-filter backdrop-blur-xl border border-white/8 rounded-2xl ${getGlowColorClass()} transition-shadow duration-500 max-h-[90vh] overflow-y-auto p-6 text-[#F5F6FA] relative w-full max-w-2xl z-10 flex flex-col gap-6`}>
         
+        {/* Absolute Fast Escape Button HUD Bracket */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-5 right-5 p-2 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20 text-[#9CA3B5] hover:text-[#F5F6FA] transition-all duration-300 cursor-pointer"
+          aria-label="Close panel"
+        >
+          <X size={16} />
+        </button>
+
         {/* Modal Header */}
-        <div className="border-b border-white/6 pb-4 flex flex-col gap-1">
+        <div className="border-b border-white/6 pb-4 flex flex-col gap-1 pr-10">
           <h2 className="text-xl font-medium tracking-wide">Add a Card to Workspace</h2>
           <p className="text-sm text-[#9CA3B5] font-normal">Expand your dashboard ecosystem by storing a new unit.</p>
         </div>
